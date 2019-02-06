@@ -1,0 +1,67 @@
+buildscript {
+    ext {
+        mariadbVersion = "2.1.2"
+    }
+
+    dependencies {
+        classpath "org.mariadb.jdbc:mariadb-java-client:${mariadbVersion}"
+        classpath 'org.glassfish.jaxb:jaxb-runtime:2.3.1'
+    }
+}
+
+plugins {
+    id "org.flywaydb.flyway" version "5.2.4"
+    id 'nu.studer.jooq' version '3.0.3'
+}
+
+bootJar {
+    enabled = false
+}
+
+flyway {
+    url = 'jdbc:mariadb://localhost:3306'
+    user = 'root'
+    password = 'jobjava00'
+    schemas = ['test']
+}
+
+jooq {
+    sample(sourceSets.main) {
+        jdbc {
+            driver = 'org.mariadb.jdbc.Driver'
+            url = 'jdbc:mariadb://localhost:3306/test'
+            user = 'root'
+            password = 'jobjava00'
+        }
+
+        generator {
+            database {
+                name = "org.jooq.meta.mariadb.MariaDBDatabase"
+                schemata {
+                    schema {
+                        inputSchema = "test"
+                    }
+                }
+            }
+
+            target {
+                packageName = 'com.github.jobjava00.domain.jooq'
+                directory = 'src/generated/jooq'
+            }
+        }
+    }
+}
+
+task migrateDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
+    url = 'jdbc:mariadb://localhost:3306'
+    user = 'root'
+    password = 'jobjava00'
+    schemas = ['test']
+}
+
+dependencies {
+    compile 'org.jooq:jooq'
+    jooqRuntime "org.mariadb.jdbc:mariadb-java-client:${mariadbVersion}"
+}
+
+generateSampleJooqSchemaSource.dependsOn = [migrateDatabase]
