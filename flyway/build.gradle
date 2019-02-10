@@ -59,10 +59,9 @@ jooq {
 }
 
 task migrateDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
-    url = 'jdbc:mysql://localhost:3306'
+    url = project.dbUrl
     user = 'root'
     password = 'jobjava00'
-    schemas = ['test']
 }
 
 dependencies {
