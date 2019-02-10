@@ -1,10 +1,15 @@
 buildscript {
     ext {
         mariadbVersion = "2.1.2"
+        mysqldbVersion = "8.0.11"
+        //dbUrl = "jdbc:mariadb://localhost:3306/test"
+        dbUrl = "jdbc:mysql://localhost:3306/test"
+        dbSchema = "test"
     }
 
     dependencies {
-        classpath "org.mariadb.jdbc:mariadb-java-client:${mariadbVersion}"
+        //classpath "org.mariadb.jdbc:mariadb-java-client:${mariadbVersion}"
+        classpath "mysql:mysql-connector-java:${mysqldbVersion}"
         classpath 'org.glassfish.jaxb:jaxb-runtime:2.3.1'
     }
 }
@@ -19,27 +24,28 @@ bootJar {
 }
 
 flyway {
-    url = 'jdbc:mariadb://localhost:3306'
+    url = project.dbUrl
     user = 'root'
     password = 'jobjava00'
-    schemas = ['test']
 }
 
 jooq {
     sample(sourceSets.main) {
         jdbc {
-            driver = 'org.mariadb.jdbc.Driver'
-            url = 'jdbc:mariadb://localhost:3306/test'
+            //driver = 'org.mariadb.jdbc.Driver'
+            driver = 'com.mysql.jdbc.Driver'
+            url = project.dbUrl
             user = 'root'
             password = 'jobjava00'
         }
 
         generator {
             database {
-                name = "org.jooq.meta.mariadb.MariaDBDatabase"
+                //name = "org.jooq.meta.mariadb.MariaDBDatabase"
+                name = "org.jooq.meta.mysql.MySQLDatabase"
                 schemata {
                     schema {
-                        inputSchema = "test"
+                        inputSchema = project.dbSchema
                     }
                 }
             }
@@ -53,7 +59,7 @@ jooq {
 }
 
 task migrateDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
-    url = 'jdbc:mariadb://localhost:3306'
+    url = 'jdbc:mysql://localhost:3306'
     user = 'root'
     password = 'jobjava00'
     schemas = ['test']
@@ -61,7 +67,9 @@ task migrateDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
 
 dependencies {
     compile 'org.jooq:jooq'
-    jooqRuntime "org.mariadb.jdbc:mariadb-java-client:${mariadbVersion}"
+    //jooqRuntime "org.mariadb.jdbc:mariadb-java-client:${mariadbVersion}"
+    jooqRuntime "mysql:mysql-connector-java:${mysqldbVersion}"
 }
 
 generateSampleJooqSchemaSource.dependsOn = [migrateDatabase]
+project.tasks.getByName('compileJava').dependsOn -= 'generateSampleJooqSchemaSource'
