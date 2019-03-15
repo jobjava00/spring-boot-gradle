@@ -1,14 +1,14 @@
-package com.github.jobjava00.gradle;
+package jxls;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+/**
+ * @author jobjava00
+ */
 @SpringBootApplication
-public class GradleApplication {
-
+public class JxlsApplication {
 	public static void main(String[] args) {
-		SpringApplication.run(GradleApplication.class, args);
+		SpringApplication.run(JxlsApplication.class, args);
 	}
-
 }
-
